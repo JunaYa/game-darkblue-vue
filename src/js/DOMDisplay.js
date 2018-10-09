@@ -4,7 +4,7 @@ function elt(name, attrs, ...children) {
         dom.setAttribute(attr, attrs[attr]);
     }
     for (let child of children) {
-        if(child) {
+        if (child) {
             dom.appendChild(child);
         }
     }
@@ -21,7 +21,7 @@ function drawGrid(level) {
         ...level.rows.map(row => {
             return elt(
                 "tr",
-                { style: `height: ${scale}px`},
+                { style: `height: ${scale}px` },
                 ...row.map(type => elt("td", { class: type }))
             );
         })
@@ -29,14 +29,18 @@ function drawGrid(level) {
 }
 
 function drawActors(actors) {
-    return elt('div', {}, ...actors.map(actor => {
-        let rect = elt('div', {class: `actor ${actor.type}`});
-        rect.style.width = `${actor.size.x * scale}px`;
-        rect.style.height = `${actor.size.y * scale}px`;
-        rect.style.left = `${actor.pos.x*scale}px`;
-        rect.style.top = `${actor.pos.y*scale}px`;
-        return rect;
-    }));
+    return elt(
+        "div",
+        {},
+        ...actors.map(actor => {
+            let rect = elt("div", { class: `actor ${actor.type}` });
+            rect.style.width = `${actor.size.x * scale}px`;
+            rect.style.height = `${actor.size.y * scale}px`;
+            rect.style.left = `${actor.pos.x * scale}px`;
+            rect.style.top = `${actor.pos.y * scale}px`;
+            return rect;
+        })
+    );
 }
 
 export default class DOMDisplay {
@@ -51,36 +55,35 @@ export default class DOMDisplay {
 }
 
 DOMDisplay.prototype.setState = function(state) {
-    if(this.actorLayer) this.actorLayer.remove();
+    if (this.actorLayer) this.actorLayer.remove();
     this.actorLayer = drawActors(state.actors);
     this.dom.appendChild(this.actorLayer);
     this.dom.className = `game ${state.status}`;
     this.scrollPlayerIntoView(state);
-}
+};
 
 DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
-    let width = this.dom.childWidth;
-    let height = this.dom.childHeight;
+    let width = this.dom.clientWidth;
+    let height = this.dom.clientHeight;
     let margin = width / 3;
 
-    // the viewPort
+    // The viewport
     let left = this.dom.scrollLeft;
     let right = left + width;
     let top = this.dom.scrollTop;
     let bottom = top + height;
 
     let player = state.player;
-    let center = player.pos.plus(player.size.times()).times(scale);
+    let center = player.pos.plus(player.size.times(0.5)).times(scale);
 
-    if(center.x < left + margin) {
+    if (center.x < left + margin) {
         this.dom.scrollLeft = center.x - margin;
     } else if (center.x > right - margin) {
         this.dom.scrollLeft = center.x + margin - width;
     }
-
-    if(center.y < top + margin) {
+    if (center.y < top + margin) {
         this.dom.scrollTop = center.y - margin;
-    } else if(center.y > bottom - margin) {
+    } else if (center.y > bottom - margin) {
         this.dom.scrollTop = center.y + margin - height;
     }
-}
+};

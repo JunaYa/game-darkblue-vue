@@ -4,9 +4,9 @@ export default class Vec {
         this.y = y;
     }
     plus(other) {
-        return new Vec(this.x+other.x, this.y+other.y);
+        return new Vec(this.x + other.x, this.y + other.y);
     }
     times(factor) {
-        return new Vec(this.x*factor, this.y*factor);
+        return new Vec(this.x * factor, this.y * factor);
     }
 }
