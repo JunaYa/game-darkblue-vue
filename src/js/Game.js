@@ -31,8 +31,8 @@ function runAnimation(frameFunc) {
     requestAnimationFrame(frame);
 }
 
-function runLevel(parent, level) {
-    let display = new DOMDisplay(parent, level);
+function runLevel( ctx, level) {
+    let display = new DOMDisplay(ctx, level);
     let state = State.start(level);
     let ending = 1;
     return new Promise(resolve => {
@@ -53,9 +53,9 @@ function runLevel(parent, level) {
     });
 }
 
-async function run(parent, plans) {
+async function run(ctx, plans) {
     for (let level = 0; level < plans.length; ) {
-        let status = await runLevel(parent, new Level(plans[level]));
+        let status = await runLevel(ctx, new Level(plans[level]));
         if (status == "won") {
             level++;
         }

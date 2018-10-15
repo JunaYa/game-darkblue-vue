@@ -1,65 +1,87 @@
-function elt(name, attrs, ...children) {
-    let dom = document.createElement(name);
-    for (let attr of Object.keys(attrs)) {
-        dom.setAttribute(attr, attrs[attr]);
-    }
-    for (let child of children) {
-        if (child) {
-            dom.appendChild(child);
-        }
-    }
-    return dom;
-}
 const scale = 20;
-function drawGrid(level) {
-    return elt(
-        "table",
-        {
-            class: "background",
-            style: `width: ${level.width * scale}px`
-        },
-        ...level.rows.map(row => {
-            return elt(
-                "tr",
-                { style: `height: ${scale}px` },
-                ...row.map(type => elt("td", { class: type }))
-            );
-        })
-    );
+
+function drawBackground(ctx) {
+    ctx.fillStyle = '#333333';
+    ctx.fillRect(0, 0, 1024, 375);
 }
 
-function drawActors(actors) {
-    return elt(
-        "div",
-        {},
-        ...actors.map(actor => {
-            let rect = elt("div", { class: `actor ${actor.type}` });
-            rect.style.width = `${actor.size.x * scale}px`;
-            rect.style.height = `${actor.size.y * scale}px`;
-            rect.style.left = `${actor.pos.x * scale}px`;
-            rect.style.top = `${actor.pos.y * scale}px`;
-            return rect;
-        })
-    );
+function drawActors(ctx, actors) {
+    const coin = {
+        width: 10,
+        height: 10
+    };
+    const hero = {
+        width: 10,
+        height: 20
+    };
+    const lava = {
+        width: 10,
+        height: 10
+    };
+    let startX = 0;
+    let startY = 0;
+    actors.map(actor => {
+        switch (actor.type) {
+            case "coin":
+                startX = actor.pos.x * coin.width;
+                startY = actor.pos.y * coin.height;
+                ctx.fillStyle = "#00ff00";
+                ctx.fillRect(startX, startY, coin.width, coin.height);
+                break;
+            case "player":
+                startX = actor.pos.x * hero.width;
+                startY = actor.pos.y * hero.height;
+                ctx.fillStyle = "#0000ff";
+                ctx.fillRect(startX, startY, hero.width, hero.height);
+                break;
+            case "lava":
+                startX = actor.pos.x * lava.width;
+                startY = actor.pos.y * lava.height;
+                ctx.fillStyle = "#ff0000";
+                ctx.fillRect(startX, startY, lava.width, lava.height);
+                break;
+        }
+    });
+}
+
+function drawWalls(ctx, level) {
+    const wall = {
+        width: 10,
+        height: 10
+    };
+    ctx.fillStyle = "#ffffff";
+    let startX = 0;
+    let startY = 0;
+    level.rows.map((row, y) => {
+        return row.map((pixel, x) => {
+            startX = x * wall.width;
+            startY = y * wall.height;
+            if (pixel === "wall") {
+                ctx.fillRect(startX, startY, wall.width, wall.height);
+            }
+        });
+    });
 }
 
 export default class DOMDisplay {
-    constructor(parent, level) {
-        this.dom = elt("div", { class: "game" }, drawGrid(level));
-        this.actorLayer = null;
-        parent.appendChild(this.dom);
+    constructor(ctx, level) {
+        this.ctx = ctx;
+        this.level = level;
+        console.log(level);
     }
     clear() {
-        this.dom.remove();
+        this.ctx.clearRect(0, 0, 1024, 375);
     }
 }
 
 DOMDisplay.prototype.setState = function(state) {
     if (this.actorLayer) this.actorLayer.remove();
-    this.actorLayer = drawActors(state.actors);
-    this.dom.appendChild(this.actorLayer);
-    this.dom.className = `game ${state.status}`;
-    this.scrollPlayerIntoView(state);
+    this.ctx.clearRect(0, 0, 1024, 375);
+    drawBackground(this.ctx);
+    drawActors(this.ctx, state.actors);
+    drawWalls(this.ctx, this.level);
+    // this.dom.className = `game ${state.status}`;
+    // this.scrollPlayerIntoView(state);
 };
 
 DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
