@@ -1,12 +1,12 @@
 const scale = 20;
-const width = 1024;
+const width = 644;
 const height = 375;
 let baseWidth = 10;
 let baseHeight = 10;
 
-function drawPixle(ctx, x, y, pixle) {
-    const startX = x * pixle.width;
-    const startY = y * pixle.height;
+function drawPixle(ctx, x, y, pixle, dom) {
+    const startX = x * pixle.width - dom.scrollLeft;
+    const startY = y * pixle.height - dom.scrollTop;
     ctx.fillStyle = pixle.color;
     ctx.fillRect(startX, startY, pixle.width, pixle.height);
 }
@@ -16,7 +16,7 @@ function drawBackground(ctx) {
     ctx.fillRect(0, 0, width, height);
 }
 
-function drawActors(ctx, actors) {
+function drawActors(ctx, actors, dom) {
     const coin = {
         width: baseWidth,
         height: baseHeight,
@@ -35,22 +35,27 @@ function drawActors(ctx, actors) {
     actors.map(actor => {
         switch (actor.type) {
             case "coin":
-                drawPixle(ctx, actor.pos.x, actor.pos.y, coin);
+                drawPixle(ctx, actor.pos.x, actor.pos.y, coin, dom);
                 break;
             case "player":
                 const startX = actor.pos.x * hero.width;
                 const startY = actor.pos.y * hero.height;
                 ctx.fillStyle = hero.color;
-                ctx.fillRect(startX, startY, hero.width, (hero.height * 3) / 2);
+                ctx.fillRect(
+                    startX - dom.scrollLeft,
+                    startY - dom.scrollTop,
+                    hero.width,
+                    (hero.height * 3) / 2
+                );
                 break;
             case "lava":
-                drawPixle(ctx, actor.pos.x, actor.pos.y, lava);
+                drawPixle(ctx, actor.pos.x, actor.pos.y, lava, dom);
                 break;
         }
     });
 }
 
-function drawWalls(ctx, level) {
+function drawWalls(ctx, level, dom) {
     const wall = {
         width: baseWidth,
         height: baseHeight,
@@ -65,10 +70,10 @@ function drawWalls(ctx, level) {
         return row.map((pixel, x) => {
             switch (pixel.type) {
                 case "wall":
-                    drawPixle(ctx, pixel.pos.x, pixel.pos.y, wall);
+                    drawPixle(ctx, x, y, wall, dom);
                     break;
                 case "magma":
-                    drawPixle(ctx, pixel.pos.x, pixel.pos.y, lava);
+                    drawPixle(ctx, x, y, lava, dom);
                     break;
             }
         });
@@ -82,25 +87,34 @@ export default class DOMDisplay {
         this.level = level;
         baseHeight = Math.floor(height / level.height);
         baseWidth = baseHeight;
+        this.dom = {
+            scrollLeft: 0,
+            scrollTop: 0
+        };
     }
     clear() {
         this.ctx.clearRect(0, 0, width, height);
+    }
+    resetDom() {
+        this.dom = {
+            scrollLeft: 0,
+            scrollTop: 0
+        };
     }
 }
 
 DOMDisplay.prototype.setState = function(state) {
     this.clear();
     drawBackground(this.ctx);
-    drawActors(this.ctx, state.actors);
-    drawWalls(this.ctx, this.level);
-    // this.dom.className = `game ${state.status}`;
-    // this.scrollPlayerIntoView(state);
+    drawActors(this.ctx, state.actors, this.dom);
+    drawWalls(this.ctx, this.level, this.dom);
+    this.resetDom();
+    this.dom.className = `game ${state.status}`;
+    this.scrollPlayerIntoView(state);
 };
 
 DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
-    let width = this.dom.clientWidth;
-    let height = this.dom.clientHeight;
-    let margin = width / 3;
+    let margin = 50;
 
     // The viewport
     let left = this.dom.scrollLeft;
@@ -121,4 +135,7 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
     } else if (center.y > bottom - margin) {
         this.dom.scrollTop = center.y + margin - height;
     }
+
+    this.dom.scrollLeft = Math.round(this.dom.scrollLeft);
+    this.dom.scrollTop = Math.round(this.dom.scrollTop);
 };

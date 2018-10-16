@@ -25,13 +25,13 @@ Coin.prototype.collide = function(state) {
     return new State(state.level, filtered, status);
 };
 
-const wobbleSpeed = 8;
-const wobbleDist = 0.07;
+const wobbleSpeed = 5;
+const wobbleDist = 0.02;
 Coin.prototype.update = function(time) {
     let wobble = this.wobble + time * wobbleSpeed;
     let wobblePos = Math.sin(wobble) * wobbleDist;
     return new Coin(
-        this.basePos.plus(new Vec(0, wobblePos)),
+        this.pos.plus(new Vec(0, wobblePos)),
         this.basePos,
         wobble
     );

@@ -1,6 +1,7 @@
 import Level from "../js/Level.js";
 import State from "../js/State.js";
 import DOMDisplay from "../js/DOMDisplay.js";
+import Vec from "./Vec.js";
 
 function trackKeys(keys) {
     let down = Object.create(null);
@@ -31,13 +32,13 @@ function runAnimation(frameFunc) {
     requestAnimationFrame(frame);
 }
 
-function runLevel( ctx, level) {
+function runLevel(ctx, level) {
     let display = new DOMDisplay(ctx, level);
     let state = State.start(level);
     let ending = 1;
     return new Promise(resolve => {
         runAnimation(time => {
-            state = state.update(time, arrowKeys);
+            state = state.update(time, arrowKeys, display.dom);
             display.setState(state);
             if (state.status == "playing") {
                 return true;
@@ -63,5 +64,5 @@ async function run(ctx, plans) {
 }
 
 export default {
-    run,
-}
+    run
+};

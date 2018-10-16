@@ -15,7 +15,7 @@ export default {
     name: "GameCanvas",
     mounted() {
         let canvas = this.$refs.canvas;
-        canvas.width = 1024;
+        canvas.width = 644;
         canvas.height = 375;
         let ctx = this.$refs.canvas.getContext("2d");
         Game.run(ctx, GAME_LEVELS.plans);

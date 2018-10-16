@@ -21,8 +21,9 @@ function overlap(actor1, actor2) {
     );
 }
 
-State.prototype.update = function(time, keys) {
+State.prototype.update = function(time, keys, dom) {
     let actors = this.actors.map(actor => actor.update(time, this, keys));
+    
     let newState = new State(this.level, actors, this.status);
     if (newState.status != "playing") return newState;
     let player = newState.player;
