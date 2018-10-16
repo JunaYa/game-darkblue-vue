@@ -2,11 +2,14 @@ import Vec from './Vec';
 import Player from './Player';
 import Coin from './Coin';
 import Lava from './Lava';
+import Wall from './Wall';
+import Magma from './Magma';
+import Empty from './Empty';
 
 const levelChars = {
     '.' : 'empty',
     '#' : 'wall',
-    '+' : 'lava',
+    '+' : 'magma',
     '@' : Player,
     'o' : Coin,
     '=' : Lava,
@@ -24,11 +27,20 @@ export default class Level {
             return row.map((ch, x) => {
                 let type = levelChars[ch];
                 if( typeof type == 'string' ) {
-                    return type;
+                    switch(type) {
+                        case 'wall':
+                            return Wall.create(new Vec(x,y));
+                        case "empty":
+                            return Empty.create(new Vec(x,y));
+                        case "magma":
+                            return Magma.create(new Vec(x,y));
+                        default :
+                            return Empty.create(new Vec(x,y));
+                    }
                 }
                 let actor = type.create(new Vec(x,y), ch);
                 this.startActors.push(actor);
-                return 'empty';
+                return Empty.create(new Vec(x,y));
             });
         })
     }
@@ -44,8 +56,8 @@ Level.prototype.touches = function(pos, size, type) {
         for(let x = xStart ; x < xEnd; x ++) {
             let isOutside = x < 0 || x >= this.width ||
                             y < 0 || y >= this.height;
-            let here = isOutside ? 'wall' : this.rows[y][x];
-            if(here == type) return true;
+            let here = isOutside ? "wall" : this.rows[y][x];
+            if(here.type == type) return true;
         }
     }
     return false;

@@ -63,12 +63,12 @@ function drawWalls(ctx, level) {
     };
     level.rows.map((row, y) => {
         return row.map((pixel, x) => {
-            switch (pixel) {
+            switch (pixel.type) {
                 case "wall":
-                    drawPixle(ctx, x, y, wall);
+                    drawPixle(ctx, pixel.pos.x, pixel.pos.y, wall);
                     break;
-                case "lava":
-                    drawPixle(ctx, x, y, lava);
+                case "magma":
+                    drawPixle(ctx, pixel.pos.x, pixel.pos.y, lava);
                     break;
             }
         });
@@ -77,6 +77,7 @@ function drawWalls(ctx, level) {
 
 export default class DOMDisplay {
     constructor(ctx, level) {
+        console.log(level);
         this.ctx = ctx;
         this.level = level;
         baseHeight = Math.floor(height / level.height);
