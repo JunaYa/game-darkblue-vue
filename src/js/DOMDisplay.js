@@ -1,44 +1,50 @@
 const scale = 20;
+const width = 1024;
+const height = 375;
+let baseWidth = 10;
+let baseHeight = 10;
+
+function drawPixle(ctx, x, y, pixle) {
+    const startX = x * pixle.width;
+    const startY = y * pixle.height;
+    ctx.fillStyle = pixle.color;
+    ctx.fillRect(startX, startY, pixle.width, pixle.height);
+}
 
 function drawBackground(ctx) {
-    ctx.fillStyle = '#333333';
-    ctx.fillRect(0, 0, 1024, 375);
+    ctx.fillStyle = "#333333";
+    ctx.fillRect(0, 0, width, height);
 }
 
 function drawActors(ctx, actors) {
     const coin = {
-        width: 10,
-        height: 10
+        width: baseWidth,
+        height: baseHeight,
+        color: "#00ff00"
     };
     const hero = {
-        width: 10,
-        height: 20
+        width: baseWidth,
+        height: baseHeight,
+        color: "#0000ff"
     };
     const lava = {
-        width: 10,
-        height: 10
+        width: baseWidth,
+        height: baseHeight,
+        color: "#ff0000"
     };
-    let startX = 0;
-    let startY = 0;
     actors.map(actor => {
         switch (actor.type) {
             case "coin":
-                startX = actor.pos.x * coin.width;
-                startY = actor.pos.y * coin.height;
-                ctx.fillStyle = "#00ff00";
-                ctx.fillRect(startX, startY, coin.width, coin.height);
+                drawPixle(ctx, actor.pos.x, actor.pos.y, coin);
                 break;
             case "player":
-                startX = actor.pos.x * hero.width;
-                startY = actor.pos.y * hero.height;
-                ctx.fillStyle = "#0000ff";
-                ctx.fillRect(startX, startY, hero.width, hero.height);
+                const startX = actor.pos.x * hero.width;
+                const startY = actor.pos.y * hero.height;
+                ctx.fillStyle = hero.color;
+                ctx.fillRect(startX, startY, hero.width, (hero.height * 3) / 2);
                 break;
             case "lava":
-                startX = actor.pos.x * lava.width;
-                startY = actor.pos.y * lava.height;
-                ctx.fillStyle = "#ff0000";
-                ctx.fillRect(startX, startY, lava.width, lava.height);
+                drawPixle(ctx, actor.pos.x, actor.pos.y, lava);
                 break;
         }
     });
@@ -46,18 +52,24 @@ function drawActors(ctx, actors) {
 
 function drawWalls(ctx, level) {
     const wall = {
-        width: 10,
-        height: 10
+        width: baseWidth,
+        height: baseHeight,
+        color: "#ffffff"
     };
-    ctx.fillStyle = "#ffffff";
-    let startX = 0;
-    let startY = 0;
+    const lava = {
+        width: baseWidth,
+        height: baseHeight,
+        color: "#ff0000"
+    };
     level.rows.map((row, y) => {
         return row.map((pixel, x) => {
-            startX = x * wall.width;
-            startY = y * wall.height;
-            if (pixel === "wall") {
-                ctx.fillRect(startX, startY, wall.width, wall.height);
+            switch (pixel) {
+                case "wall":
+                    drawPixle(ctx, x, y, wall);
+                    break;
+                case "lava":
+                    drawPixle(ctx, x, y, lava);
+                    break;
             }
         });
     });
@@ -67,16 +79,16 @@ export default class DOMDisplay {
     constructor(ctx, level) {
         this.ctx = ctx;
         this.level = level;
-        console.log(level);
+        baseHeight = Math.floor(height / level.height);
+        baseWidth = baseHeight;
     }
     clear() {
-        this.ctx.clearRect(0, 0, 1024, 375);
+        this.ctx.clearRect(0, 0, width, height);
     }
 }
 
 DOMDisplay.prototype.setState = function(state) {
-    if (this.actorLayer) this.actorLayer.remove();
-    this.ctx.clearRect(0, 0, 1024, 375);
+    this.clear();
     drawBackground(this.ctx);
     drawActors(this.ctx, state.actors);
     drawWalls(this.ctx, this.level);
