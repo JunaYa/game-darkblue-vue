@@ -114,7 +114,8 @@ DOMDisplay.prototype.setState = function(state) {
 };
 
 DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
-    let margin = 50;
+    let marginH = width / 6;
+    let marginV = height / 8;
 
     // The viewport
     let left = this.dom.scrollLeft;
@@ -125,15 +126,15 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
     let player = state.player;
     let center = player.pos.plus(player.size.times(0.5)).times(scale);
 
-    if (center.x < left + margin) {
-        this.dom.scrollLeft = center.x - margin;
-    } else if (center.x > right - margin) {
-        this.dom.scrollLeft = center.x + margin - width;
+    if (center.x < left + marginH) {
+        this.dom.scrollLeft = center.x - marginH;
+    } else if (center.x > right - marginH) {
+        this.dom.scrollLeft = center.x + marginH - width;
     }
-    if (center.y < top + margin) {
-        this.dom.scrollTop = center.y - margin;
-    } else if (center.y > bottom - margin) {
-        this.dom.scrollTop = center.y + margin - height;
+    if (center.y < top + marginV) {
+        this.dom.scrollTop = center.y - marginV;
+    } else if (center.y > bottom - marginV) {
+        this.dom.scrollTop = center.y + marginV - height;
     }
 
     this.dom.scrollLeft = Math.round(this.dom.scrollLeft);

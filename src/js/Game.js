@@ -47,6 +47,7 @@ function runLevel(ctx, level) {
                 return true;
             } else {
                 display.clear();
+                display.resetDom();
                 resolve(state.status);
                 return false;
             }
