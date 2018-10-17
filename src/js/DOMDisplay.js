@@ -3,6 +3,7 @@ const width = 644;
 const height = 375;
 const baseWidth = 15;
 const baseHeight = baseWidth;
+let status = "";
 
 function drawPixle(ctx, x, y, pixle, dom) {
     const startX = x * pixle.width - dom.scrollLeft;
@@ -25,7 +26,9 @@ function drawActors(ctx, actors, dom) {
     const hero = {
         width: baseWidth,
         height: baseHeight,
-        color: "#0000ff"
+        color: "#0000ff",
+        lost: "#c90000",
+        won: "#f5d865"
     };
     const lava = {
         width: baseWidth,
@@ -40,7 +43,15 @@ function drawActors(ctx, actors, dom) {
             case "player":
                 const startX = actor.pos.x * hero.width;
                 const startY = actor.pos.y * hero.height;
-                ctx.fillStyle = hero.color;
+
+                if (status === "lost") {
+                    ctx.fillStyle = hero.lost;
+                } else if (status === "won") {
+                    ctx.fillStyle = hero.won;
+                } else {
+                    ctx.fillStyle = hero.color;
+                }
+
                 ctx.fillRect(
                     startX - dom.scrollLeft,
                     startY - dom.scrollTop,
@@ -108,7 +119,7 @@ DOMDisplay.prototype.setState = function(state) {
     drawActors(this.ctx, state.actors, this.dom);
     drawWalls(this.ctx, this.level, this.dom);
     this.resetDom();
-    this.status = state.status;
+    status = state.status;
     this.scrollPlayerIntoView(state);
 };
 
