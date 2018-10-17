@@ -3,13 +3,12 @@ import Player from './Player';
 import Coin from './Coin';
 import Lava from './Lava';
 import Wall from './Wall';
-import Magma from './Magma';
 import Empty from './Empty';
 
 const levelChars = {
     '.' : 'empty',
     '#' : 'wall',
-    '+' : 'magma',
+    '+' : Lava,
     '@' : Player,
     'o' : Coin,
     '=' : Lava,
@@ -32,8 +31,6 @@ export default class Level {
                             return Wall.create(new Vec(x,y));
                         case "empty":
                             return Empty.create(new Vec(x,y));
-                        case "magma":
-                            return Magma.create(new Vec(x,y));
                         default :
                             return Empty.create(new Vec(x,y));
                     }

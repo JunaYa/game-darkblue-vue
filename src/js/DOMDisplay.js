@@ -83,9 +83,6 @@ function drawWalls(ctx, level, dom) {
                 case "wall":
                     drawPixle(ctx, x, y, wall, dom);
                     break;
-                case "magma":
-                    drawPixle(ctx, x, y, lava, dom);
-                    break;
             }
         });
     });
