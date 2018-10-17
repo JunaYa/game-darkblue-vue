@@ -1,8 +1,8 @@
 const scale = 20;
 const width = 644;
 const height = 375;
-let baseWidth = 10;
-let baseHeight = 10;
+const baseWidth = 15;
+const baseHeight = baseWidth;
 
 function drawPixle(ctx, x, y, pixle, dom) {
     const startX = x * pixle.width - dom.scrollLeft;
@@ -82,15 +82,14 @@ function drawWalls(ctx, level, dom) {
 
 export default class DOMDisplay {
     constructor(ctx, level) {
-        console.log(level);
-        this.ctx = ctx;
-        this.level = level;
-        baseHeight = Math.floor(height / level.height);
-        baseWidth = baseHeight;
         this.dom = {
             scrollLeft: 0,
             scrollTop: 0
         };
+        this.ctx = ctx;
+        this.level = level;
+        this.canvasWidth = baseWidth * level.width;
+        this.canvasHeight = baseHeight * level.height;
     }
     clear() {
         this.ctx.clearRect(0, 0, width, height);
@@ -109,7 +108,7 @@ DOMDisplay.prototype.setState = function(state) {
     drawActors(this.ctx, state.actors, this.dom);
     drawWalls(this.ctx, this.level, this.dom);
     this.resetDom();
-    this.dom.className = `game ${state.status}`;
+    this.status = state.status;
     this.scrollPlayerIntoView(state);
 };
 
@@ -118,9 +117,9 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
     let marginV = height / 8;
 
     // The viewport
-    let left = this.dom.scrollLeft;
+    let left = 0;
     let right = left + width;
-    let top = this.dom.scrollTop;
+    let top = 0;
     let bottom = top + height;
 
     let player = state.player;
@@ -139,4 +138,11 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
 
     this.dom.scrollLeft = Math.round(this.dom.scrollLeft);
     this.dom.scrollTop = Math.round(this.dom.scrollTop);
+
+    if (this.dom.scrollLeft > this.canvasWidth - width + 2 * marginH) {
+        this.dom.scrollLeft = this.canvasWidth - width;
+    }
+    if (this.dom.scrollTop > this.canvasHeight - height + 2 * marginV) {
+        this.dom.scrollTop = this.canvasHeight - height;
+    }
 };
