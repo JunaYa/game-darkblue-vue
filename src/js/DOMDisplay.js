@@ -72,11 +72,6 @@ function drawWalls(ctx, level, dom) {
         height: baseHeight,
         color: "#ffffff"
     };
-    const lava = {
-        width: baseWidth,
-        height: baseHeight,
-        color: "#ff0000"
-    };
     level.rows.map((row, y) => {
         return row.map((pixel, x) => {
             switch (pixel.type) {
@@ -85,6 +80,38 @@ function drawWalls(ctx, level, dom) {
                     break;
             }
         });
+    });
+}
+
+function drawHandle(ctx, handle) {
+    ctx.fillStyle = "#666666";
+
+    handle.Azimuths.map(azimuth => {
+        ctx.beginPath();
+        ctx.arc(azimuth.x, azimuth.y, azimuth.width, 0, 2 * Math.PI);
+        ctx.fillStyle = '#bebebe60';
+        ctx.fill();
+        ctx.lineWidth = handle.lineWidth;
+        if(azimuth.active) {
+            ctx.strokeStyle = '#bebebe90';
+        } else {
+            ctx.strokeStyle = '#bebebe90';
+        }
+        ctx.stroke();
+    });
+
+    handle.Attacks.map(attack => {
+        ctx.beginPath();
+        ctx.arc(attack.x, attack.y, attack.width, 0, 2 * Math.PI);
+        ctx.fillStyle = '#bebebe60';
+        ctx.fill();
+        ctx.lineWidth = handle.lineWidth;
+        if(attack.active) {
+            ctx.strokeStyle = '#bebebe90';
+        } else {
+            ctx.strokeStyle = '#bebebe90';
+        }
+        ctx.stroke();
     });
 }
 
@@ -115,6 +142,7 @@ DOMDisplay.prototype.setState = function(state) {
     drawBackground(this.ctx);
     drawActors(this.ctx, state.actors, this.dom);
     drawWalls(this.ctx, this.level, this.dom);
+    drawHandle(this.ctx, state.handle);
     this.resetDom();
     status = state.status;
     this.scrollPlayerIntoView(state);

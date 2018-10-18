@@ -1,11 +1,12 @@
 export default class State {
-    constructor(level, actors, status) {
+    constructor(level, actors, status, handle) {
         this.level = level;
         this.actors = actors;
+        this.handle = handle;
         this.status = status;
     }
-    static start(level) {
-        return new State(level, level.startActors, "playing");
+    static start(level, handle) {
+        return new State(level, level.startActors, "playing", handle);
     }
     get player() {
         return this.actors.find(a => a.type == "player");
@@ -21,14 +22,14 @@ function overlap(actor1, actor2) {
     );
 }
 
-State.prototype.update = function(time, keys, dom) {
-    let actors = this.actors.map(actor => actor.update(time, this, keys));
-    
-    let newState = new State(this.level, actors, this.status);
+State.prototype.update = function(time, keys, event) {
+    const actions = this.handle.actions(event);
+    const actors = this.actors.map(actor => actor.update(time, this, keys, actions));
+    let newState = new State(this.level, actors, this.status, this.handle);
     if (newState.status != "playing") return newState;
     let player = newState.player;
     if (this.level.touches(player.pos, player.size, "lava")) {
-        return new State(this.level, actors, "lost");
+        return new State(this.level, actors, "lost", this.handle);
     }
     for (let actor of actors) {
         if (actor != player && overlap(actor, player)) {

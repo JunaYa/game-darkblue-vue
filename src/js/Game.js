@@ -1,7 +1,7 @@
 import Level from "../js/Level.js";
 import State from "../js/State.js";
 import DOMDisplay from "../js/DOMDisplay.js";
-import Vec from "./Vec.js";
+import Handle from "./Handle.js";
 
 function trackKeys(keys) {
     let down = Object.create(null);
@@ -32,13 +32,48 @@ function runAnimation(frameFunc) {
     requestAnimationFrame(frame);
 }
 
-function runLevel(ctx, level) {
+let event = {
+    x: 0,
+    y: 0,
+    type: "none"
+};
+
+function registerListener(canvas) {
+    canvas.addEventListener("touchstart", (e) => {
+        const touchStart = e.touches[0];
+        if(e.type === 'touchstart') {
+            event.type = e.type;
+            event.x = touchStart.clientX;
+            event.y = touchStart.clientY;
+        }
+    }, false);
+    canvas.addEventListener("touchend", (e) => {
+        const touchStart = e.changedTouches[0];
+        if(e.type === 'touchend') {
+            event.type = e.type;
+            event.x = touchStart.clientX;
+            event.y = touchStart.clientY;
+        }
+    }, false);
+    canvas.addEventListener("touchmove", (e) => {
+        const touchmove = e.touches[0];
+        if(e.type === 'touchmove') {
+            event.type = e.type;
+            event.x = touchmove.clientX;
+            event.y = touchmove.clientY;
+        }
+    }, false);
+}
+
+function runLevel(canvas, level) {
+    registerListener(canvas);
+    const ctx = canvas.getContext("2d");
     let display = new DOMDisplay(ctx, level);
-    let state = State.start(level);
+    let state = State.start(level, new Handle(canvas.width, canvas.height));
     let ending = 1;
     return new Promise(resolve => {
         runAnimation(time => {
-            state = state.update(time, arrowKeys, display.dom);
+            state = state.update(time, arrowKeys, event);
             display.setState(state);
             if (state.status == "playing") {
                 return true;

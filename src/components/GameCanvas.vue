@@ -1,9 +1,11 @@
 <template>
     <div>
-        <canvas id="canvas" ref="canvas"></canvas>
-        <div>
-
-        </div>
+        <canvas 
+            id="canvas" 
+            ref="canvas" 
+            width="644" 
+            height="375" >
+        </canvas>
     </div>
 </template>
 
@@ -14,11 +16,7 @@ import Game from "../js/Game.js";
 export default {
     name: "GameCanvas",
     mounted() {
-        let canvas = this.$refs.canvas;
-        canvas.width = 644;
-        canvas.height = 375;
-        let ctx = this.$refs.canvas.getContext("2d");
-        Game.run(ctx, GAME_LEVELS.plans);
+        Game.run(this.$refs.canvas, GAME_LEVELS.plans);
     }
 };
 </script>

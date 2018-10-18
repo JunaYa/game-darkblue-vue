@@ -18,10 +18,17 @@ Player.prototype.size = new Vec(0.8, 1.5);
 const playerXSpeed = 7;
 const gravity = 30;
 const jumpSpeed = 17;
-Player.prototype.update = function(time, state, keys) {
+Player.prototype.update = function(time, state, keys, actions) {
     let xSpeed = 0;
+    const isLeftAction =
+        actions && actions.azimuth && actions.azimuth.action === "LEFT";
+    const isRight =
+        actions && actions.azimuth && actions.azimuth.action === "RIGHT";
+    if (isLeftAction) xSpeed -= playerXSpeed;
+    if (isRight) xSpeed += playerXSpeed;
     if (keys.ArrowLeft) xSpeed -= playerXSpeed;
     if (keys.ArrowRight) xSpeed += playerXSpeed;
+    
     let pos = this.pos;
     let movedX = pos.plus(new Vec(xSpeed * time, 0));
     if (!state.level.touches(movedX, this.size, "wall")) {
@@ -29,12 +36,15 @@ Player.prototype.update = function(time, state, keys) {
     }
     let ySpeed = this.speed.y + time * gravity;
     let movedY = pos.plus(new Vec(0, ySpeed * time));
+    const isJumpAction =
+        (actions.attack && actions.attack.action === "JUMP") || keys.ArrowUp;
     if (!state.level.touches(movedY, this.size, "wall")) {
         pos = movedY;
-    } else if (keys.ArrowUp && ySpeed > 0) {
+    } else if (isJumpAction && ySpeed > 0) {
         ySpeed = -jumpSpeed;
     } else {
         ySpeed = 0;
     }
+
     return new Player(pos, new Vec(xSpeed, ySpeed));
 };

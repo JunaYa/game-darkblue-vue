@@ -26,7 +26,7 @@ export default class Lava {
 Lava.prototype.size = new Vec(1, 1);
 
 Lava.prototype.collide = function(state) {
-    return new State(state.level, state.actors, "lost");
+    return new State(state.level, state.actors, "lost", state.handle);
 };
 
 Lava.prototype.update = function(time, state) {
